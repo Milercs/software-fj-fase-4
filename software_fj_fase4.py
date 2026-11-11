@@ -17,6 +17,23 @@ logging.basicConfig(
 )
 
 
+# Excepción general del programa
+class ErrorSoftwareFJ(Exception):
+    """Representa un error controlado dentro del sistema."""
+
+
+class ClienteInvalidoError(ErrorSoftwareFJ):
+    """Se usa cuando los datos de un cliente no son válidos."""
+
+
+class ServicioInvalidoError(ErrorSoftwareFJ):
+    """Se usa cuando los datos de un servicio no son válidos."""
+
+
+class ReservaInvalidaError(ErrorSoftwareFJ):
+    """Se usa cuando hay un problema al realizar una reserva."""
+
+
 def main():
     print("=" * 50)
     print("SISTEMA DE GESTIÓN - SOFTWARE FJ")
