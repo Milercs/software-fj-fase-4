@@ -280,6 +280,7 @@ class ConsultoriaEspecializada(Servicio):
 # Clase que representa una reserva realizada por un cliente
 class Reserva:
 
+  
     def __init__(self, id_reserva, cliente, servicio, duracion):
 
         if not isinstance(id_reserva, str) or not id_reserva.strip():
@@ -299,9 +300,12 @@ class Reserva:
         self.__servicio = servicio
         self.__duracion = duracion
         self.__costo_total = servicio.calcular_costo(duracion)
+        self.__estado = "Activa"
 
         logging.info("Reserva %s registrada correctamente.", self.__id_reserva)
 
+
+    
     def mostrar_informacion(self):
         print("\nINFORMACIÓN DE LA RESERVA")
         print(f"Código: {self.__id_reserva}")
@@ -309,11 +313,10 @@ class Reserva:
         print(f"Servicio: {self.__servicio.nombre}")
         print(f"Duración: {self.__duracion}")
         print(f"Costo total: ${self.__costo_total:,.0f}")
-        
-        
-        
- 
+        print(f"Estado: {self.__estado}")
+
     def cancelar_reserva(self):
+
         self.__estado = "Cancelada"
         logging.info(
             "La reserva %s fue cancelada.",
@@ -400,7 +403,8 @@ def main():
     
     # Cancelar la reserva de prueba
     reserva_prueba.cancelar_reserva()
-
+    
+    reserva_prueba.mostrar_informacion()
  
 
 
