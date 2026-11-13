@@ -194,6 +194,48 @@ class ReservaEspacio(Servicio):
         print(f"Nombre: {self.nombre}")
         print(f"Descripción: {self.descripcion}")
         print(f"Tarifa por hora: ${self._tarifa_por_hora:,.0f}")
+        
+# Clase AlquilerEquipo: hereda de Servicio
+class AlquilerEquipo(Servicio):
+
+    def __init__(self, nombre, descripcion, tarifa_por_dia):
+
+        # Validar la tarifa diaria
+        if not isinstance(tarifa_por_dia, (int, float)) or tarifa_por_dia <= 0:
+            raise ServicioInvalidoError(
+                "La tarifa diaria debe ser mayor que cero."
+            )
+
+        super().__init__(nombre, descripcion)
+
+        self._tarifa_por_dia = tarifa_por_dia
+
+    # Calcular el costo del alquiler
+    def calcular_costo(self, duracion, impuestos=0, descuento=0):
+
+        if not isinstance(duracion, (int, float)) or duracion <= 0:
+            raise ServicioInvalidoError(
+                "La duración debe ser mayor que cero."
+            )
+
+        if impuestos < 0 or descuento < 0:
+            raise ServicioInvalidoError(
+                "Los impuestos y descuentos no pueden ser negativos."
+            )
+
+        subtotal = self._tarifa_por_dia * duracion
+        total = subtotal + (subtotal * impuestos / 100)
+        total -= subtotal * descuento / 100
+
+        return total
+
+    # Mostrar la descripción del servicio
+    def mostrar_descripcion(self):
+
+        print("\nSERVICIO DE ALQUILER DE EQUIPOS")
+        print(f"Nombre: {self.nombre}")
+        print(f"Descripción: {self.descripcion}")
+        print(f"Tarifa por día: ${self._tarifa_por_dia:,.0f}")
 
 
 def main():
@@ -227,6 +269,20 @@ def main():
     costo = servicio_prueba.calcular_costo(2)
 
     print(f"Costo de la reserva: ${costo:,.0f}")
+    
+    # Crear un servicio de alquiler de equipos
+    equipo_prueba = AlquilerEquipo(
+        "Proyector",
+        "Alquiler de proyector para eventos",
+        80000
+    )
+
+    equipo_prueba.mostrar_descripcion()
+
+    costo_equipo = equipo_prueba.calcular_costo(3)
+
+    print(f"Costo del alquiler: ${costo_equipo:,.0f}")
+
 
 
 if __name__ == "__main__":
