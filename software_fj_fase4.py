@@ -309,6 +309,19 @@ class Reserva:
         print(f"Servicio: {self.__servicio.nombre}")
         print(f"Duración: {self.__duracion}")
         print(f"Costo total: ${self.__costo_total:,.0f}")
+        
+        
+        
+ 
+    def cancelar_reserva(self):
+        self.__estado = "Cancelada"
+        logging.info(
+            "La reserva %s fue cancelada.",
+            self.__id_reserva
+        )
+        print(f"La reserva {self.__id_reserva} ha sido cancelada.")
+
+
 
 
 def main():
@@ -381,8 +394,14 @@ def main():
     )
 
     reserva_prueba.mostrar_informacion()
- 
 
+    
+
+    
+    # Cancelar la reserva de prueba
+    reserva_prueba.cancelar_reserva()
+
+ 
 
 
 if __name__ == "__main__":
