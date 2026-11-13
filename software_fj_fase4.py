@@ -276,6 +276,41 @@ class ConsultoriaEspecializada(Servicio):
         print(f"Tarifa por hora: ${self._tarifa_por_hora:,.0f}")
 
 
+
+# Clase que representa una reserva realizada por un cliente
+class Reserva:
+
+    def __init__(self, id_reserva, cliente, servicio, duracion):
+
+        if not isinstance(id_reserva, str) or not id_reserva.strip():
+            raise ReservaInvalidaError("El código de la reserva es obligatorio.")
+
+        if not isinstance(cliente, Cliente):
+            raise ReservaInvalidaError("Debe seleccionar un cliente válido.")
+
+        if not isinstance(servicio, Servicio):
+            raise ReservaInvalidaError("Debe seleccionar un servicio válido.")
+
+        if not isinstance(duracion, (int, float)) or duracion <= 0:
+            raise ReservaInvalidaError("La duración debe ser positiva.")
+
+        self.__id_reserva = id_reserva.strip()
+        self.__cliente = cliente
+        self.__servicio = servicio
+        self.__duracion = duracion
+        self.__costo_total = servicio.calcular_costo(duracion)
+
+        logging.info("Reserva %s registrada correctamente.", self.__id_reserva)
+
+    def mostrar_informacion(self):
+        print("\nINFORMACIÓN DE LA RESERVA")
+        print(f"Código: {self.__id_reserva}")
+        print(f"Cliente: {self.__cliente.nombre}")
+        print(f"Servicio: {self.__servicio.nombre}")
+        print(f"Duración: {self.__duracion}")
+        print(f"Costo total: ${self.__costo_total:,.0f}")
+
+
 def main():
     print("=" * 50)
     print("SISTEMA DE GESTIÓN - SOFTWARE FJ")
@@ -333,7 +368,20 @@ def main():
     costo_consultoria = consultoria_prueba.calcular_costo(2)
 
     print(f"Costo de la consultoría: ${costo_consultoria:,.0f}")
+   
+   
+   
+   
+    # Crear una reserva de prueba
+    reserva_prueba = Reserva(
+        "RES001",
+        cliente_prueba,
+        servicio_prueba,
+        2
+    )
 
+    reserva_prueba.mostrar_informacion()
+ 
 
 
 
