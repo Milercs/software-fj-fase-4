@@ -34,23 +34,78 @@ class ReservaInvalidaError(ErrorSoftwareFJ):
     """Se usa cuando hay un problema al realizar una reserva."""
 
 
-# Clase para guardar la información de los clientes
-class Cliente:
+# Clase abstracta que representa las entidades del sistema
+class Entidad(ABC):
+
+    def __init__(self, identificacion):
+        self._identificacion = identificacion
+
+    @property
+    def identificacion(self):
+        return self._identificacion
+
+    @abstractmethod
+    def mostrar_informacion(self):
+        """Método que deben implementar las clases derivadas."""
+        pass
+
+
+# Clase Cliente: hereda de Entidad
+class Cliente(Entidad):
 
     def __init__(self, identificacion, nombre, correo, telefono):
-        self.identificacion = identificacion
-        self.nombre = nombre
-        self.correo = correo
-        self.telefono = telefono
+
+        # Validar identificación
+        if not isinstance(identificacion, str) or not identificacion.isdigit():
+            raise ClienteInvalidoError(
+                "La identificación debe contener solamente números."
+            )
+
+        # Validar nombre
+        if not isinstance(nombre, str) or not nombre.strip():
+            raise ClienteInvalidoError(
+                "El nombre del cliente es obligatorio."
+            )
+
+        # Validar correo electrónico
+        if not isinstance(correo, str) or "@" not in correo or "." not in correo.split("@")[-1]:
+            raise ClienteInvalidoError(
+                "El correo electrónico no es válido."
+            )
+
+        # Validar teléfono
+        if not isinstance(telefono, str) or not telefono.isdigit() or len(telefono) != 10:
+            raise ClienteInvalidoError(
+                "El teléfono debe tener exactamente 10 dígitos."
+            )
+
+        super().__init__(identificacion)
+
+        # Encapsular los datos personales del cliente
+        self.__nombre = nombre.strip()
+        self.__correo = correo.strip()
+        self.__telefono = telefono
 
         logging.info(
-            f"Se creó el cliente {self.nombre} "
-            f"con identificación {self.identificacion}."
+            f"Cliente registrado correctamente: {self.__nombre}"
         )
 
+    @property
+    def nombre(self):
+        return self.__nombre
+
+    @property
+    def correo(self):
+        return self.__correo
+
+    @property
+    def telefono(self):
+        return self.__telefono
+
     def mostrar_informacion(self):
-        """Muestra los datos principales del cliente."""
-        print("\nDatos del cliente")
+        """Muestra la información del cliente."""
+
+        print("\nDATOS DEL CLIENTE")
         print(f"Identificación: {self.identificacion}")
         print(f"Nombre: {self.nombre}")
         print(f"Correo: {self.correo}")
