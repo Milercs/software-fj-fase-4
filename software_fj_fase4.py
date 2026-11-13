@@ -238,6 +238,44 @@ class AlquilerEquipo(Servicio):
         print(f"Tarifa por día: ${self._tarifa_por_dia:,.0f}")
 
 
+
+# Clase que representa los servicios de consultoría especializada
+class ConsultoriaEspecializada(Servicio):
+
+    def __init__(self, nombre, descripcion, tarifa_por_hora):
+        super().__init__(nombre, descripcion)
+
+        if not isinstance(tarifa_por_hora, (int, float)) or tarifa_por_hora <= 0:
+            raise ServicioInvalidoError(
+                "La tarifa por hora debe ser un número positivo."
+            )
+
+        self._tarifa_por_hora = tarifa_por_hora
+
+    def calcular_costo(self, duracion, impuestos=0, descuento=0):
+        if not isinstance(duracion, (int, float)) or duracion <= 0:
+            raise ServicioInvalidoError(
+                "La duración de la consultoría debe ser positiva."
+            )
+
+        if impuestos < 0 or descuento < 0:
+            raise ServicioInvalidoError(
+                "Los impuestos y descuentos no pueden ser negativos."
+            )
+
+        subtotal = self._tarifa_por_hora * duracion
+        total = subtotal + (subtotal * impuestos / 100)
+        total -= subtotal * descuento / 100
+
+        return total
+
+    def mostrar_descripcion(self):
+        print("\nSERVICIO DE CONSULTORÍA ESPECIALIZADA")
+        print(f"Nombre: {self.nombre}")
+        print(f"Descripción: {self.descripcion}")
+        print(f"Tarifa por hora: ${self._tarifa_por_hora:,.0f}")
+
+
 def main():
     print("=" * 50)
     print("SISTEMA DE GESTIÓN - SOFTWARE FJ")
@@ -282,6 +320,20 @@ def main():
     costo_equipo = equipo_prueba.calcular_costo(3)
 
     print(f"Costo del alquiler: ${costo_equipo:,.0f}")
+    
+    # Crear un servicio de consultoría especializada
+    consultoria_prueba = ConsultoriaEspecializada(
+        "Asesoría administrativa",
+        "Consultoría para empresas y organizaciones",
+        60000
+    )
+
+    consultoria_prueba.mostrar_descripcion()
+
+    costo_consultoria = consultoria_prueba.calcular_costo(2)
+
+    print(f"Costo de la consultoría: ${costo_consultoria:,.0f}")
+
 
 
 
