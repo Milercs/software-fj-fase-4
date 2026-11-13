@@ -112,6 +112,90 @@ class Cliente(Entidad):
         print(f"Teléfono: {self.telefono}")
 
 
+# Clase abstracta que representa los servicios del sistema
+class Servicio(ABC):
+
+    def __init__(self, nombre, descripcion):
+
+        # Validar el nombre del servicio
+        if not isinstance(nombre, str) or not nombre.strip():
+            raise ServicioInvalidoError(
+                "El nombre del servicio es obligatorio."
+            )
+
+        # Validar la descripción
+        if not isinstance(descripcion, str) or not descripcion.strip():
+            raise ServicioInvalidoError(
+                "La descripción del servicio es obligatoria."
+            )
+
+        self._nombre = nombre.strip()
+        self._descripcion = descripcion.strip()
+
+    # Propiedad para consultar el nombre
+    @property
+    def nombre(self):
+        return self._nombre
+
+    # Propiedad para consultar la descripción
+    @property
+    def descripcion(self):
+        return self._descripcion
+
+    # Método abstracto para calcular el costo
+    @abstractmethod
+    def calcular_costo(self, duracion, impuestos=0, descuento=0):
+        pass
+
+    # Método abstracto para mostrar la información
+    @abstractmethod
+    def mostrar_descripcion(self):
+        pass
+
+
+# Clase ReservaEspacio: hereda de Servicio
+class ReservaEspacio(Servicio):
+
+    def __init__(self, nombre, descripcion, tarifa_por_hora):
+
+        # Validar la tarifa por hora
+        if not isinstance(tarifa_por_hora, (int, float)) or tarifa_por_hora <= 0:
+            raise ServicioInvalidoError(
+                "La tarifa por hora debe ser un número mayor que cero."
+            )
+
+        super().__init__(nombre, descripcion)
+
+        self._tarifa_por_hora = tarifa_por_hora
+
+    # Calcular el costo de la reserva
+    def calcular_costo(self, duracion, impuestos=0, descuento=0):
+
+        if not isinstance(duracion, (int, float)) or duracion <= 0:
+            raise ServicioInvalidoError(
+                "La duración debe ser mayor que cero."
+            )
+
+        if impuestos < 0 or descuento < 0:
+            raise ServicioInvalidoError(
+                "Los impuestos y descuentos no pueden ser negativos."
+            )
+
+        subtotal = self._tarifa_por_hora * duracion
+        total = subtotal + (subtotal * impuestos / 100)
+        total -= subtotal * descuento / 100
+
+        return total
+
+    # Mostrar la descripción del servicio
+    def mostrar_descripcion(self):
+
+        print("\nSERVICIO DE RESERVA DE ESPACIO")
+        print(f"Nombre: {self.nombre}")
+        print(f"Descripción: {self.descripcion}")
+        print(f"Tarifa por hora: ${self._tarifa_por_hora:,.0f}")
+
+
 def main():
     print("=" * 50)
     print("SISTEMA DE GESTIÓN - SOFTWARE FJ")
@@ -128,6 +212,21 @@ def main():
     )
 
     cliente_prueba.mostrar_informacion()
+
+    # Crear un servicio de reserva de espacio
+    servicio_prueba = ReservaEspacio(
+        "Sala de reuniones",
+        "Espacio para reuniones empresariales",
+        50000
+    )
+
+    # Mostrar la información del servicio
+    servicio_prueba.mostrar_descripcion()
+
+    # Calcular el costo de dos horas
+    costo = servicio_prueba.calcular_costo(2)
+
+    print(f"Costo de la reserva: ${costo:,.0f}")
 
 
 if __name__ == "__main__":
