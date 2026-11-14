@@ -7,7 +7,6 @@ Proyecto desarrollado para la Fase 4 del curso Programación.
 import logging
 from abc import ABC, abstractmethod
 
-
 # Configuración del archivo donde se guardarán los eventos
 logging.basicConfig(
     filename="software_fj.log",
@@ -15,7 +14,6 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
     encoding="utf-8"
 )
-
 
 # Excepciones básicas del sistema
 class ErrorSoftwareFJ(Exception):
@@ -48,7 +46,6 @@ class Entidad(ABC):
     def mostrar_informacion(self):
         """Método que deben implementar las clases derivadas."""
         pass
-
 
 # Clase Cliente: hereda de Entidad
 class Cliente(Entidad):
@@ -237,8 +234,6 @@ class AlquilerEquipo(Servicio):
         print(f"Descripción: {self.descripcion}")
         print(f"Tarifa por día: ${self._tarifa_por_dia:,.0f}")
 
-
-
 # Clase que representa los servicios de consultoría especializada
 class ConsultoriaEspecializada(Servicio):
 
@@ -275,37 +270,68 @@ class ConsultoriaEspecializada(Servicio):
         print(f"Descripción: {self.descripcion}")
         print(f"Tarifa por hora: ${self._tarifa_por_hora:,.0f}")
 
-
-
 # Clase que representa una reserva realizada por un cliente
 class Reserva:
 
-  
     def __init__(self, id_reserva, cliente, servicio, duracion):
-
         if not isinstance(id_reserva, str) or not id_reserva.strip():
-            raise ReservaInvalidaError("El código de la reserva es obligatorio.")
+            raise ReservaInvalidaError(
+                "El código de la reserva es obligatorio."
+            )
 
         if not isinstance(cliente, Cliente):
-            raise ReservaInvalidaError("Debe seleccionar un cliente válido.")
+            raise ReservaInvalidaError(
+                "Debe seleccionar un cliente válido."
+            )
 
         if not isinstance(servicio, Servicio):
-            raise ReservaInvalidaError("Debe seleccionar un servicio válido.")
+            raise ReservaInvalidaError(
+                "Debe seleccionar un servicio válido."
+            )
 
         if not isinstance(duracion, (int, float)) or duracion <= 0:
-            raise ReservaInvalidaError("La duración debe ser positiva.")
+            raise ReservaInvalidaError(
+                "La duración debe ser positiva."
+            )
 
         self.__id_reserva = id_reserva.strip()
         self.__cliente = cliente
         self.__servicio = servicio
         self.__duracion = duracion
         self.__costo_total = servicio.calcular_costo(duracion)
-        self.__estado = "Activa"
+        self.__estado = "Pendiente"
 
-        logging.info("Reserva %s registrada correctamente.", self.__id_reserva)
+        logging.info(
+            "Reserva %s registrada correctamente.",
+            self.__id_reserva
+        )
 
+    @property
+    def estado(self):
+        """Permite consultar el estado actual de la reserva."""
+        return self.__estado
 
-    
+    def confirmar_reserva(self):
+        """Confirma una reserva que se encuentra pendiente."""
+        if self.__estado == "Cancelada":
+            raise ReservaInvalidaError(
+                "No se puede confirmar una reserva cancelada."
+            )
+
+        if self.__estado == "Confirmada":
+            raise ReservaInvalidaError(
+                "La reserva ya se encuentra confirmada."
+            )
+
+        self.__estado = "Confirmada"
+
+        logging.info(
+            "La reserva %s fue confirmada.",
+            self.__id_reserva
+        )
+
+        print(f"La reserva {self.__id_reserva} fue confirmada.")
+
     def mostrar_informacion(self):
         print("\nINFORMACIÓN DE LA RESERVA")
         print(f"Código: {self.__id_reserva}")
@@ -316,16 +342,14 @@ class Reserva:
         print(f"Estado: {self.__estado}")
 
     def cancelar_reserva(self):
-
         self.__estado = "Cancelada"
+
         logging.info(
             "La reserva %s fue cancelada.",
             self.__id_reserva
         )
+
         print(f"La reserva {self.__id_reserva} ha sido cancelada.")
-
-
-
 
 def main():
     print("=" * 50)
@@ -384,31 +408,25 @@ def main():
     costo_consultoria = consultoria_prueba.calcular_costo(2)
 
     print(f"Costo de la consultoría: ${costo_consultoria:,.0f}")
-   
-   
-   
-   
-    # Crear una reserva de prueba
-    reserva_prueba = Reserva(
-        "RES001",
-        cliente_prueba,
-        servicio_prueba,
-        2
-    )
+      
+# Crear una reserva de prueba
+reserva_prueba = Reserva(
+    "RES001",
+    cliente_prueba,
+    servicio_prueba,
+    2
+)
 
-    reserva_prueba.mostrar_informacion()
+# Mostrar la reserva con estado pendiente
+reserva_prueba.mostrar_informacion()
 
-    
+# Confirmar y mostrar nuevamente la reserva
+reserva_prueba.confirmar_reserva()
+reserva_prueba.mostrar_informacion()
 
-    
-    # Cancelar la reserva de prueba
-    reserva_prueba.cancelar_reserva()
-    
-    reserva_prueba.mostrar_informacion()
+# Cancelar la reserva confirmada
+reserva_prueba.cancelar_reserva()
+reserva_prueba.mostrar_informacion()
  
-
-
 if __name__ == "__main__":
     main()
-
-# Proyecto colaborativo Fase 4 - Software FJ
