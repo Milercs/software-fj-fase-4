@@ -375,14 +375,11 @@ def main():
         50000
     )
 
-    # Mostrar la información del servicio
     servicio_prueba.mostrar_descripcion()
 
-    # Calcular el costo de dos horas
     costo = servicio_prueba.calcular_costo(2)
-
     print(f"Costo de la reserva: ${costo:,.0f}")
-    
+
     # Crear un servicio de alquiler de equipos
     equipo_prueba = AlquilerEquipo(
         "Proyector",
@@ -393,9 +390,8 @@ def main():
     equipo_prueba.mostrar_descripcion()
 
     costo_equipo = equipo_prueba.calcular_costo(3)
-
     print(f"Costo del alquiler: ${costo_equipo:,.0f}")
-    
+
     # Crear un servicio de consultoría especializada
     consultoria_prueba = ConsultoriaEspecializada(
         "Asesoría administrativa",
@@ -406,27 +402,27 @@ def main():
     consultoria_prueba.mostrar_descripcion()
 
     costo_consultoria = consultoria_prueba.calcular_costo(2)
-
     print(f"Costo de la consultoría: ${costo_consultoria:,.0f}")
-      
-# Crear una reserva de prueba
-reserva_prueba = Reserva(
-    "RES001",
-    cliente_prueba,
-    servicio_prueba,
-    2
-)
 
-# Mostrar la reserva con estado pendiente
-reserva_prueba.mostrar_informacion()
+    # Crear una reserva de prueba
+    reserva_prueba = Reserva(
+        "RES001",
+        cliente_prueba,
+        servicio_prueba,
+        2
+    )
 
-# Confirmar y mostrar nuevamente la reserva
-reserva_prueba.confirmar_reserva()
-reserva_prueba.mostrar_informacion()
+    # Mostrar la reserva con estado pendiente
+    reserva_prueba.mostrar_informacion()
 
-# Cancelar la reserva confirmada
-reserva_prueba.cancelar_reserva()
-reserva_prueba.mostrar_informacion()
- 
+    # Confirmar y mostrar nuevamente la reserva
+    reserva_prueba.confirmar_reserva()
+    reserva_prueba.mostrar_informacion()
+
+    # Cancelar la reserva confirmada
+    reserva_prueba.cancelar_reserva()
+    reserva_prueba.mostrar_informacion()
+
+
 if __name__ == "__main__":
     main()
