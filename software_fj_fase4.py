@@ -410,6 +410,20 @@ def main():
     # Mostrar los clientes registrados
     gestor_clientes.listar_clientes()
 
+    # Buscar un cliente por su identificación
+    cliente_encontrado = gestor_clientes.buscar_cliente("1108456723")
+
+    if cliente_encontrado:
+        print("\nCLIENTE ENCONTRADO")
+        cliente_encontrado.mostrar_informacion()
+    else:
+        print("\nEl cliente no fue encontrado.")
+        
+            # Eliminar un cliente por su identificación
+    gestor_clientes.eliminar_cliente("1108456723")
+
+    # Verificar que el cliente ya no esté registrado
+    gestor_clientes.listar_clientes()
 
     # Crear un servicio de reserva de espacio
     servicio_prueba = ReservaEspacio(

@@ -50,3 +50,14 @@
 2026-11-17 15:53:21,072 - INFO - Cliente registrado correctamente.
 2026-11-17 15:53:21,073 - INFO - Reserva RES001 registrada correctamente.
 2026-11-17 15:53:21,074 - INFO - La reserva RES001 fue cancelada.
+2026-11-17 16:04:26,368 - INFO - El programa inició correctamente.
+2026-11-17 16:04:26,368 - INFO - Cliente registrado correctamente: Carlos Ramírez
+2026-11-17 16:04:26,370 - INFO - Cliente registrado correctamente.
+2026-11-17 16:04:26,375 - INFO - Reserva RES001 registrada correctamente.
+2026-11-17 16:04:26,377 - INFO - La reserva RES001 fue cancelada.
+2026-11-17 16:06:15,840 - INFO - El programa inició correctamente.
+2026-11-17 16:06:15,840 - INFO - Cliente registrado correctamente: Carlos Ramírez
+2026-11-17 16:06:15,841 - INFO - Cliente registrado correctamente.
+2026-11-17 16:06:15,842 - INFO - Cliente eliminado correctamente.
+2026-11-17 16:06:15,843 - INFO - Reserva RES001 registrada correctamente.
+2026-11-17 16:06:15,843 - INFO - La reserva RES001 fue cancelada.
