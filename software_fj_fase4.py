@@ -112,6 +112,63 @@ class Cliente(Entidad):
         print(f"Teléfono: {self.telefono}")
 
 
+
+# Clase encargada de administrar la lista de clientes
+class GestorClientes:
+
+    def __init__(self):
+        # Lista interna donde se almacenan los clientes
+        self.__clientes = []
+
+    # Método para registrar un cliente
+    def registrar_cliente(self, cliente):
+
+        if not isinstance(cliente, Cliente):
+            raise ClienteInvalidoError("El objeto ingresado no es un cliente válido.")
+
+        # Evitar clientes con identificación duplicada
+        for cliente_existente in self.__clientes:
+            if cliente_existente.identificacion == cliente.identificacion:
+                raise ClienteInvalidoError("Ya existe un cliente con esa identificación.")
+
+        self.__clientes.append(cliente)
+        logging.info("Cliente registrado correctamente.")
+        print("Cliente registrado exitosamente.")
+
+    # Método para buscar un cliente por identificación
+    def buscar_cliente(self, identificacion):
+
+        for cliente in self.__clientes:
+            if cliente.identificacion == identificacion:
+                return cliente
+
+        return None
+
+    # Método para eliminar un cliente
+    def eliminar_cliente(self, identificacion):
+
+        cliente = self.buscar_cliente(identificacion)
+
+        if cliente is None:
+            raise ClienteInvalidoError("No se encontró el cliente que desea eliminar.")
+
+        self.__clientes.remove(cliente)
+        logging.info("Cliente eliminado correctamente.")
+        print("Cliente eliminado exitosamente.")
+
+    # Método para mostrar todos los clientes
+    def listar_clientes(self):
+
+        if not self.__clientes:
+            print("No hay clientes registrados.")
+            return
+
+        print("\nLISTADO DE CLIENTES")
+
+        for cliente in self.__clientes:
+            cliente.mostrar_informacion()
+
+
 # Clase abstracta que representa los servicios del sistema
 class Servicio(ABC):
 
@@ -343,6 +400,16 @@ def main():
     )
 
     cliente_prueba.mostrar_informacion()
+
+    # Crear el administrador de clientes
+    gestor_clientes = GestorClientes()
+
+    # Registrar el cliente en la lista interna
+    gestor_clientes.registrar_cliente(cliente_prueba)
+
+    # Mostrar los clientes registrados
+    gestor_clientes.listar_clientes()
+
 
     # Crear un servicio de reserva de espacio
     servicio_prueba = ReservaEspacio(
