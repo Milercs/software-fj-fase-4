@@ -334,10 +334,10 @@ class ConsultoriaEspecializada(Servicio):
 
 
 
+
 # Clase que representa una reserva realizada por un cliente
 class Reserva:
 
-  
     def __init__(self, id_reserva, cliente, servicio, duracion):
 
         if not isinstance(id_reserva, str) or not id_reserva.strip():
@@ -349,7 +349,7 @@ class Reserva:
         if not isinstance(servicio, Servicio):
             raise ReservaInvalidaError("Debe seleccionar un servicio válido.")
 
-        if not isinstance(duracion, (int, float)) or duracion <= 0:
+        if not isinstance(duracion, (int, float)) or isinstance(duracion, bool) or duracion <= 0:
             raise ReservaInvalidaError("La duración debe ser positiva.")
 
         self.__id_reserva = id_reserva.strip()
@@ -357,12 +357,22 @@ class Reserva:
         self.__servicio = servicio
         self.__duracion = duracion
         self.__costo_total = servicio.calcular_costo(duracion)
-        self.__estado = "Activa"
+        self.__estado = "Pendiente"
 
         logging.info("Reserva %s registrada correctamente.", self.__id_reserva)
 
+    @property
+    def id_reserva(self):
+        return self.__id_reserva
 
-    
+    @property
+    def estado(self):
+        return self.__estado
+
+    @property
+    def costo_total(self):
+        return self.__costo_total
+
     def mostrar_informacion(self):
         print("\nINFORMACIÓN DE LA RESERVA")
         print(f"Código: {self.__id_reserva}")
@@ -372,15 +382,118 @@ class Reserva:
         print(f"Costo total: ${self.__costo_total:,.0f}")
         print(f"Estado: {self.__estado}")
 
+    # Confirmar una reserva pendiente
+    def confirmar_reserva(self):
+
+        if self.__estado != "Pendiente":
+            raise ReservaInvalidaError(
+                "Solo se pueden confirmar reservas pendientes."
+            )
+
+        self.__estado = "Activa"
+
+        logging.info("Reserva %s confirmada.", self.__id_reserva)
+        print(f"Reserva {self.__id_reserva} confirmada exitosamente.")
+
+    # Cancelar una reserva
     def cancelar_reserva(self):
 
-        self.__estado = "Cancelada"
-        logging.info(
-            "La reserva %s fue cancelada.",
-            self.__id_reserva
-        )
-        print(f"La reserva {self.__id_reserva} ha sido cancelada.")
+        if self.__estado in ("Cancelada", "Procesada"):
+            raise ReservaInvalidaError(
+                "No se puede cancelar una reserva cancelada o procesada."
+            )
 
+        self.__estado = "Cancelada"
+
+        logging.info("Reserva %s cancelada.", self.__id_reserva)
+        print(f"Reserva {self.__id_reserva} cancelada exitosamente.")
+
+    # Procesar una reserva confirmada
+    def procesar_reserva(self):
+
+        if self.__estado != "Activa":
+            raise ReservaInvalidaError(
+                "Solo se pueden procesar reservas activas."
+            )
+
+        self.__estado = "Procesada"
+
+        logging.info("Reserva %s procesada.", self.__id_reserva)
+        print(f"Reserva {self.__id_reserva} procesada exitosamente.")
+
+
+
+# Clase encargada de administrar las reservas
+class GestorReservas:
+
+    def __init__(self):
+        self.__reservas = []
+
+    # Registrar una reserva
+    def registrar_reserva(self, reserva):
+
+        if not isinstance(reserva, Reserva):
+            raise ReservaInvalidaError("Debe ingresar una reserva válida.")
+
+        for existente in self.__reservas:
+            if existente.id_reserva == reserva.id_reserva:
+                raise ReservaInvalidaError("El código de reserva ya existe.")
+
+        self.__reservas.append(reserva)
+
+        logging.info("Reserva %s agregada al gestor.", reserva.id_reserva)
+        print(f"Reserva {reserva.id_reserva} registrada en el sistema.")
+
+    # Buscar una reserva por su código
+    def buscar_reserva(self, id_reserva):
+
+        for reserva in self.__reservas:
+            if reserva.id_reserva == id_reserva:
+                return reserva
+
+        return None
+
+    # Mostrar todas las reservas
+    def listar_reservas(self):
+
+        if not self.__reservas:
+            print("\nNo hay reservas registradas.")
+            return
+
+        print("\nLISTADO DE RESERVAS")
+
+        for reserva in self.__reservas:
+            reserva.mostrar_informacion()
+
+    # Confirmar una reserva
+    def confirmar_reserva(self, id_reserva):
+
+        reserva = self.buscar_reserva(id_reserva)
+
+        if reserva is None:
+            raise ReservaInvalidaError("No se encontró la reserva.")
+
+        reserva.confirmar_reserva()
+
+    # Cancelar una reserva
+    def cancelar_reserva(self, id_reserva):
+
+        reserva = self.buscar_reserva(id_reserva)
+
+        if reserva is None:
+            raise ReservaInvalidaError("No se encontró la reserva.")
+
+        reserva.cancelar_reserva()
+
+    # Procesar una reserva
+    def procesar_reserva(self, id_reserva):
+
+        reserva = self.buscar_reserva(id_reserva)
+
+        if reserva is None:
+            raise ReservaInvalidaError("No se encontró la reserva.")
+
+        reserva.procesar_reserva()
 
 
 
@@ -391,7 +504,7 @@ def main():
 
     logging.info("El programa inició correctamente.")
 
-    # Cliente utilizado para comprobar el funcionamiento de la clase
+    # Crear un cliente de prueba
     cliente_prueba = Cliente(
         "1108456723",
         "Carlos Ramírez",
@@ -404,13 +517,11 @@ def main():
     # Crear el administrador de clientes
     gestor_clientes = GestorClientes()
 
-    # Registrar el cliente en la lista interna
+    # Registrar y listar el cliente
     gestor_clientes.registrar_cliente(cliente_prueba)
-
-    # Mostrar los clientes registrados
     gestor_clientes.listar_clientes()
 
-    # Buscar un cliente por su identificación
+    # Buscar el cliente
     cliente_encontrado = gestor_clientes.buscar_cliente("1108456723")
 
     if cliente_encontrado:
@@ -418,12 +529,6 @@ def main():
         cliente_encontrado.mostrar_informacion()
     else:
         print("\nEl cliente no fue encontrado.")
-        
-            # Eliminar un cliente por su identificación
-    gestor_clientes.eliminar_cliente("1108456723")
-
-    # Verificar que el cliente ya no esté registrado
-    gestor_clientes.listar_clientes()
 
     # Crear un servicio de reserva de espacio
     servicio_prueba = ReservaEspacio(
@@ -432,14 +537,11 @@ def main():
         50000
     )
 
-    # Mostrar la información del servicio
     servicio_prueba.mostrar_descripcion()
 
-    # Calcular el costo de dos horas
     costo = servicio_prueba.calcular_costo(2)
-
     print(f"Costo de la reserva: ${costo:,.0f}")
-    
+
     # Crear un servicio de alquiler de equipos
     equipo_prueba = AlquilerEquipo(
         "Proyector",
@@ -450,9 +552,8 @@ def main():
     equipo_prueba.mostrar_descripcion()
 
     costo_equipo = equipo_prueba.calcular_costo(3)
-
     print(f"Costo del alquiler: ${costo_equipo:,.0f}")
-    
+
     # Crear un servicio de consultoría especializada
     consultoria_prueba = ConsultoriaEspecializada(
         "Asesoría administrativa",
@@ -463,13 +564,12 @@ def main():
     consultoria_prueba.mostrar_descripcion()
 
     costo_consultoria = consultoria_prueba.calcular_costo(2)
-
     print(f"Costo de la consultoría: ${costo_consultoria:,.0f}")
-   
-   
-   
-   
-    # Crear una reserva de prueba
+
+    # Crear el administrador de reservas
+    gestor_reservas = GestorReservas()
+
+    # Crear la primera reserva
     reserva_prueba = Reserva(
         "RES001",
         cliente_prueba,
@@ -477,19 +577,45 @@ def main():
         2
     )
 
-    reserva_prueba.mostrar_informacion()
+    # Registrar la primera reserva
+    gestor_reservas.registrar_reserva(reserva_prueba)
 
-    
+    # Mostrar las reservas registradas
+    gestor_reservas.listar_reservas()
 
-    
-    # Cancelar la reserva de prueba
-    reserva_prueba.cancelar_reserva()
-    
-    reserva_prueba.mostrar_informacion()
- 
+    # Confirmar la primera reserva
+    gestor_reservas.confirmar_reserva("RES001")
+
+    # Procesar la primera reserva
+    gestor_reservas.procesar_reserva("RES001")
+
+    # Crear una segunda reserva
+    segunda_reserva = Reserva(
+        "RES002",
+        cliente_prueba,
+        equipo_prueba,
+        3
+    )
+
+    # Registrar y cancelar la segunda reserva
+    gestor_reservas.registrar_reserva(segunda_reserva)
+    gestor_reservas.cancelar_reserva("RES002")
+
+    # Buscar una reserva por su código
+    reserva_encontrada = gestor_reservas.buscar_reserva("RES001")
+
+    if reserva_encontrada:
+        print("\nRESERVA ENCONTRADA")
+        reserva_encontrada.mostrar_informacion()
+
+    # Mostrar el listado final de reservas
+    gestor_reservas.listar_reservas()
+
+    logging.info("El programa finalizó correctamente.")
 
 
 if __name__ == "__main__":
     main()
+
 
 # Proyecto colaborativo Fase 4 - Software FJ
