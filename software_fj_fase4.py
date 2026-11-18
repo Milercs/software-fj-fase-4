@@ -7,6 +7,7 @@ Proyecto desarrollado para la Fase 4 del curso Programación.
 import logging
 from abc import ABC, abstractmethod
 
+
 # Configuración del archivo donde se guardarán los eventos
 logging.basicConfig(
     filename="software_fj.log",
@@ -14,6 +15,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
     encoding="utf-8"
 )
+
 
 # Excepciones básicas del sistema
 class ErrorSoftwareFJ(Exception):
@@ -47,6 +49,7 @@ class Entidad(ABC):
         """Método que deben implementar las clases derivadas."""
         pass
 
+
 # Clase Cliente: hereda de Entidad
 class Cliente(Entidad):
 
@@ -65,13 +68,21 @@ class Cliente(Entidad):
             )
 
         # Validar correo electrónico
-        if not isinstance(correo, str) or "@" not in correo or "." not in correo.split("@")[-1]:
+        if (
+            not isinstance(correo, str)
+            or "@" not in correo
+            or "." not in correo.split("@")[-1]
+        ):
             raise ClienteInvalidoError(
                 "El correo electrónico no es válido."
             )
 
         # Validar teléfono
-        if not isinstance(telefono, str) or not telefono.isdigit() or len(telefono) != 10:
+        if (
+            not isinstance(telefono, str)
+            or not telefono.isdigit()
+            or len(telefono) != 10
+        ):
             raise ClienteInvalidoError(
                 "El teléfono debe tener exactamente 10 dígitos."
             )
@@ -84,7 +95,8 @@ class Cliente(Entidad):
         self.__telefono = telefono
 
         logging.info(
-            f"Cliente registrado correctamente: {self.__nombre}"
+            "Cliente registrado correctamente: %s",
+            self.__nombre
         )
 
     @property
@@ -101,7 +113,6 @@ class Cliente(Entidad):
 
     def mostrar_informacion(self):
         """Muestra la información del cliente."""
-
         print("\nDATOS DEL CLIENTE")
         print(f"Identificación: {self.identificacion}")
         print(f"Nombre: {self.nombre}")
@@ -114,13 +125,11 @@ class Servicio(ABC):
 
     def __init__(self, nombre, descripcion):
 
-        # Validar el nombre del servicio
         if not isinstance(nombre, str) or not nombre.strip():
             raise ServicioInvalidoError(
                 "El nombre del servicio es obligatorio."
             )
 
-        # Validar la descripción
         if not isinstance(descripcion, str) or not descripcion.strip():
             raise ServicioInvalidoError(
                 "La descripción del servicio es obligatoria."
@@ -129,22 +138,18 @@ class Servicio(ABC):
         self._nombre = nombre.strip()
         self._descripcion = descripcion.strip()
 
-    # Propiedad para consultar el nombre
     @property
     def nombre(self):
         return self._nombre
 
-    # Propiedad para consultar la descripción
     @property
     def descripcion(self):
         return self._descripcion
 
-    # Método abstracto para calcular el costo
     @abstractmethod
     def calcular_costo(self, duracion, impuestos=0, descuento=0):
         pass
 
-    # Método abstracto para mostrar la información
     @abstractmethod
     def mostrar_descripcion(self):
         pass
@@ -155,17 +160,17 @@ class ReservaEspacio(Servicio):
 
     def __init__(self, nombre, descripcion, tarifa_por_hora):
 
-        # Validar la tarifa por hora
-        if not isinstance(tarifa_por_hora, (int, float)) or tarifa_por_hora <= 0:
+        if (
+            not isinstance(tarifa_por_hora, (int, float))
+            or tarifa_por_hora <= 0
+        ):
             raise ServicioInvalidoError(
                 "La tarifa por hora debe ser un número mayor que cero."
             )
 
         super().__init__(nombre, descripcion)
-
         self._tarifa_por_hora = tarifa_por_hora
 
-    # Calcular el costo de la reserva
     def calcular_costo(self, duracion, impuestos=0, descuento=0):
 
         if not isinstance(duracion, (int, float)) or duracion <= 0:
@@ -184,30 +189,29 @@ class ReservaEspacio(Servicio):
 
         return total
 
-    # Mostrar la descripción del servicio
     def mostrar_descripcion(self):
-
         print("\nSERVICIO DE RESERVA DE ESPACIO")
         print(f"Nombre: {self.nombre}")
         print(f"Descripción: {self.descripcion}")
         print(f"Tarifa por hora: ${self._tarifa_por_hora:,.0f}")
-        
+
+
 # Clase AlquilerEquipo: hereda de Servicio
 class AlquilerEquipo(Servicio):
 
     def __init__(self, nombre, descripcion, tarifa_por_dia):
 
-        # Validar la tarifa diaria
-        if not isinstance(tarifa_por_dia, (int, float)) or tarifa_por_dia <= 0:
+        if (
+            not isinstance(tarifa_por_dia, (int, float))
+            or tarifa_por_dia <= 0
+        ):
             raise ServicioInvalidoError(
                 "La tarifa diaria debe ser mayor que cero."
             )
 
         super().__init__(nombre, descripcion)
-
         self._tarifa_por_dia = tarifa_por_dia
 
-    # Calcular el costo del alquiler
     def calcular_costo(self, duracion, impuestos=0, descuento=0):
 
         if not isinstance(duracion, (int, float)) or duracion <= 0:
@@ -226,21 +230,24 @@ class AlquilerEquipo(Servicio):
 
         return total
 
-    # Mostrar la descripción del servicio
     def mostrar_descripcion(self):
-
         print("\nSERVICIO DE ALQUILER DE EQUIPOS")
         print(f"Nombre: {self.nombre}")
         print(f"Descripción: {self.descripcion}")
         print(f"Tarifa por día: ${self._tarifa_por_dia:,.0f}")
 
+
 # Clase que representa los servicios de consultoría especializada
 class ConsultoriaEspecializada(Servicio):
 
     def __init__(self, nombre, descripcion, tarifa_por_hora):
+
         super().__init__(nombre, descripcion)
 
-        if not isinstance(tarifa_por_hora, (int, float)) or tarifa_por_hora <= 0:
+        if (
+            not isinstance(tarifa_por_hora, (int, float))
+            or tarifa_por_hora <= 0
+        ):
             raise ServicioInvalidoError(
                 "La tarifa por hora debe ser un número positivo."
             )
@@ -248,6 +255,7 @@ class ConsultoriaEspecializada(Servicio):
         self._tarifa_por_hora = tarifa_por_hora
 
     def calcular_costo(self, duracion, impuestos=0, descuento=0):
+
         if not isinstance(duracion, (int, float)) or duracion <= 0:
             raise ServicioInvalidoError(
                 "La duración de la consultoría debe ser positiva."
@@ -270,10 +278,12 @@ class ConsultoriaEspecializada(Servicio):
         print(f"Descripción: {self.descripcion}")
         print(f"Tarifa por hora: ${self._tarifa_por_hora:,.0f}")
 
+
 # Clase que representa una reserva realizada por un cliente
 class Reserva:
 
     def __init__(self, id_reserva, cliente, servicio, duracion):
+
         if not isinstance(id_reserva, str) or not id_reserva.strip():
             raise ReservaInvalidaError(
                 "El código de la reserva es obligatorio."
@@ -313,6 +323,7 @@ class Reserva:
 
     def confirmar_reserva(self):
         """Confirma una reserva que se encuentra pendiente."""
+
         if self.__estado == "Cancelada":
             raise ReservaInvalidaError(
                 "No se puede confirmar una reserva cancelada."
@@ -321,6 +332,11 @@ class Reserva:
         if self.__estado == "Confirmada":
             raise ReservaInvalidaError(
                 "La reserva ya se encuentra confirmada."
+            )
+
+        if self.__estado == "Procesada":
+            raise ReservaInvalidaError(
+                "No se puede confirmar una reserva procesada."
             )
 
         self.__estado = "Confirmada"
@@ -332,7 +348,25 @@ class Reserva:
 
         print(f"La reserva {self.__id_reserva} fue confirmada.")
 
+    def procesar_reserva(self):
+        """Procesa una reserva que ya fue confirmada."""
+
+        if self.__estado != "Confirmada":
+            raise ReservaInvalidaError(
+                "Solo se puede procesar una reserva confirmada."
+            )
+
+        self.__estado = "Procesada"
+
+        logging.info(
+            "La reserva %s fue procesada.",
+            self.__id_reserva
+        )
+
+        print(f"La reserva {self.__id_reserva} fue procesada.")
+
     def mostrar_informacion(self):
+        """Muestra los datos principales de la reserva."""
         print("\nINFORMACIÓN DE LA RESERVA")
         print(f"Código: {self.__id_reserva}")
         print(f"Cliente: {self.__cliente.nombre}")
@@ -342,6 +376,18 @@ class Reserva:
         print(f"Estado: {self.__estado}")
 
     def cancelar_reserva(self):
+        """Cancela una reserva que todavía no está procesada."""
+
+        if self.__estado == "Cancelada":
+            raise ReservaInvalidaError(
+                "La reserva ya se encuentra cancelada."
+            )
+
+        if self.__estado == "Procesada":
+            raise ReservaInvalidaError(
+                "No se puede cancelar una reserva procesada."
+            )
+
         self.__estado = "Cancelada"
 
         logging.info(
@@ -349,16 +395,18 @@ class Reserva:
             self.__id_reserva
         )
 
-        print(f"La reserva {self.__id_reserva} ha sido cancelada.")
+        print(f"La reserva {self.__id_reserva} fue cancelada.")
+
 
 def main():
+
     print("=" * 50)
     print("SISTEMA DE GESTIÓN - SOFTWARE FJ")
     print("=" * 50)
 
     logging.info("El programa inició correctamente.")
 
-    # Cliente utilizado para comprobar el funcionamiento de la clase
+    # Cliente utilizado para comprobar el funcionamiento
     cliente_prueba = Cliente(
         "1108456723",
         "Carlos Ramírez",
@@ -368,7 +416,7 @@ def main():
 
     cliente_prueba.mostrar_informacion()
 
-    # Crear un servicio de reserva de espacio
+    # Servicio de reserva de espacio
     servicio_prueba = ReservaEspacio(
         "Sala de reuniones",
         "Espacio para reuniones empresariales",
@@ -380,7 +428,7 @@ def main():
     costo = servicio_prueba.calcular_costo(2)
     print(f"Costo de la reserva: ${costo:,.0f}")
 
-    # Crear un servicio de alquiler de equipos
+    # Servicio de alquiler de equipos
     equipo_prueba = AlquilerEquipo(
         "Proyector",
         "Alquiler de proyector para eventos",
@@ -392,7 +440,7 @@ def main():
     costo_equipo = equipo_prueba.calcular_costo(3)
     print(f"Costo del alquiler: ${costo_equipo:,.0f}")
 
-    # Crear un servicio de consultoría especializada
+    # Servicio de consultoría especializada
     consultoria_prueba = ConsultoriaEspecializada(
         "Asesoría administrativa",
         "Consultoría para empresas y organizaciones",
@@ -404,7 +452,7 @@ def main():
     costo_consultoria = consultoria_prueba.calcular_costo(2)
     print(f"Costo de la consultoría: ${costo_consultoria:,.0f}")
 
-    # Crear una reserva de prueba
+    # Primera reserva: se confirma y después se cancela
     reserva_prueba = Reserva(
         "RES001",
         cliente_prueba,
@@ -412,16 +460,24 @@ def main():
         2
     )
 
-    # Mostrar la reserva con estado pendiente
     reserva_prueba.mostrar_informacion()
-
-    # Confirmar y mostrar nuevamente la reserva
     reserva_prueba.confirmar_reserva()
     reserva_prueba.mostrar_informacion()
-
-    # Cancelar la reserva confirmada
     reserva_prueba.cancelar_reserva()
     reserva_prueba.mostrar_informacion()
+
+    # Segunda reserva: se confirma y después se procesa
+    reserva_procesada = Reserva(
+        "RES002",
+        cliente_prueba,
+        servicio_prueba,
+        3
+    )
+
+    reserva_procesada.mostrar_informacion()
+    reserva_procesada.confirmar_reserva()
+    reserva_procesada.procesar_reserva()
+    reserva_procesada.mostrar_informacion()
 
 
 if __name__ == "__main__":
