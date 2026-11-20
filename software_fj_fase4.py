@@ -23,15 +23,19 @@ class ErrorSoftwareFJ(Exception):
 
 
 class ClienteInvalidoError(ErrorSoftwareFJ):
-    """Se utiliza cuando los datos de un cliente son incorrectos."""
+    """Se usa cuando los datos de un cliente son incorrectos."""
 
 
 class ServicioInvalidoError(ErrorSoftwareFJ):
-    """Se utiliza cuando los datos de un servicio son incorrectos."""
+    """Se usa cuando los datos de un servicio son incorrectos."""
 
 
 class ReservaInvalidaError(ErrorSoftwareFJ):
-    """Se utiliza cuando se presenta un problema con una reserva."""
+    """Se usa cuando hay un problema con una reserva."""
+
+
+class DuracionInvalidaError(ReservaInvalidaError):
+    """Se usa cuando la duración ingresada no es válida."""
 
 
 # Clase general para las entidades del sistema
@@ -158,7 +162,7 @@ class ReservaEspacio(Servicio):
             or tarifa_por_hora <= 0
         ):
             raise ServicioInvalidoError(
-                "La tarifa por hora debe ser un número mayor que cero."
+                "La tarifa por hora debe ser mayor que cero."
             )
 
         super().__init__(nombre, descripcion)
@@ -240,7 +244,7 @@ class ConsultoriaEspecializada(Servicio):
             or tarifa_por_hora <= 0
         ):
             raise ServicioInvalidoError(
-                "La tarifa por hora debe ser un número positivo."
+                "La tarifa por hora debe ser mayor que cero."
             )
 
         super().__init__(nombre, descripcion)
@@ -313,7 +317,7 @@ class Reserva:
         return self.__estado
 
     def confirmar_reserva(self):
-        """Confirma una reserva que se encuentra pendiente."""
+        """Confirma una reserva pendiente."""
 
         if self.__estado == "Cancelada":
             raise ReservaInvalidaError(
@@ -388,6 +392,26 @@ class Reserva:
         print(f"Estado: {self.__estado}")
 
 
+# Esta función convierte la duración y conserva el error original
+def convertir_duracion(valor):
+    """Convierte la duración ingresada en un número."""
+
+    try:
+        duracion = float(valor)
+
+    except (ValueError, TypeError) as error_original:
+        raise DuracionInvalidaError(
+            "La duración debe ser un número."
+        ) from error_original
+
+    if duracion <= 0:
+        raise DuracionInvalidaError(
+            "La duración debe ser mayor que cero."
+        )
+
+    return duracion
+
+
 def main():
 
     print("=" * 50)
@@ -396,7 +420,7 @@ def main():
 
     logging.info("El programa inició correctamente.")
 
-    # Se crea un cliente válido para las pruebas
+    # Cliente válido para las pruebas
     cliente_prueba = Cliente(
         "1108456723",
         "Carlos Ramírez",
@@ -494,6 +518,26 @@ def main():
 
     finally:
         print("La prueba del cliente terminó.")
+
+    # Prueba para comprobar el encadenamiento de excepciones
+    print("\nPRUEBA DE ENCADENAMIENTO DE EXCEPCIONES")
+
+    try:
+        duracion_prueba = convertir_duracion("tres horas")
+
+    except DuracionInvalidaError as error:
+        print(f"Error controlado: {error}")
+
+        logging.error(
+            "No se pudo convertir la duración: %s",
+            error
+        )
+
+    else:
+        print(f"Duración válida: {duracion_prueba}")
+
+    finally:
+        print("La prueba de duración terminó.")
 
     logging.info("El programa terminó correctamente.")
 
