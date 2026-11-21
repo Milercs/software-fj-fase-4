@@ -1,14 +1,14 @@
-"""
-Sistema de gestión de clientes, servicios y reservas.
+﻿"""
+Sistema de gestiÃ³n de clientes, servicios y reservas.
 
-Proyecto desarrollado para la Fase 4 del curso Programación.
+Proyecto desarrollado para la Fase 4 del curso ProgramaciÃ³n.
 """
 
 import logging
 from abc import ABC, abstractmethod
 
 
-# Configuración del archivo donde se guardarán los eventos
+# ConfiguraciÃ³n del archivo donde se guardarÃ¡n los eventos
 logging.basicConfig(
     filename="software_fj.log",
     level=logging.INFO,
@@ -17,21 +17,42 @@ logging.basicConfig(
 )
 
 
-# Excepciones básicas del sistema
+# Excepciones bÃ¡sicas del sistema
 class ErrorSoftwareFJ(Exception):
     """Representa un error controlado dentro del sistema."""
 
 
 class ClienteInvalidoError(ErrorSoftwareFJ):
-    """Se usa cuando los datos de un cliente no son válidos."""
+    """Se usa cuando los datos de un cliente no son vÃ¡lidos."""
 
 
 class ServicioInvalidoError(ErrorSoftwareFJ):
-    """Se usa cuando los datos de un servicio no son válidos."""
+    """Se usa cuando los datos de un servicio no son vÃ¡lidos."""
 
 
 class ReservaInvalidaError(ErrorSoftwareFJ):
     """Se usa cuando hay un problema al realizar una reserva."""
+
+
+class DuracionInvalidaError(ReservaInvalidaError):
+    """Se usa cuando la duraciÃ³n ingresada no es vÃ¡lida."""
+
+
+def convertir_duracion(valor):
+    """Convierte la duraciÃ³n a nÃºmero y encadena errores de conversiÃ³n."""
+    try:
+        if isinstance(valor, bool):
+            raise TypeError("Un valor booleano no es una duraciÃ³n vÃ¡lida.")
+        duracion = float(valor)
+        if duracion <= 0:
+            raise DuracionInvalidaError(
+                "La duraciÃ³n debe ser un nÃºmero mayor que cero."
+            )
+        return duracion
+    except (ValueError, TypeError) as error_original:
+        raise DuracionInvalidaError(
+            "La duraciÃ³n debe ser un nÃºmero vÃ¡lido."
+        ) from error_original
 
 
 # Clase abstracta que representa las entidades del sistema
@@ -46,7 +67,7 @@ class Entidad(ABC):
 
     @abstractmethod
     def mostrar_informacion(self):
-        """Método que deben implementar las clases derivadas."""
+        """MÃ©todo que deben implementar las clases derivadas."""
         pass
 
 
@@ -55,10 +76,10 @@ class Cliente(Entidad):
 
     def __init__(self, identificacion, nombre, correo, telefono):
 
-        # Validar identificación
+        # Validar identificaciÃ³n
         if not isinstance(identificacion, str) or not identificacion.isdigit():
             raise ClienteInvalidoError(
-                "La identificación debe contener solamente números."
+                "La identificaciÃ³n debe contener solamente nÃºmeros."
             )
 
         # Validar nombre
@@ -67,16 +88,16 @@ class Cliente(Entidad):
                 "El nombre del cliente es obligatorio."
             )
 
-        # Validar correo electrónico
+        # Validar correo electrÃ³nico
         if not isinstance(correo, str) or "@" not in correo or "." not in correo.split("@")[-1]:
             raise ClienteInvalidoError(
-                "El correo electrónico no es válido."
+                "El correo electrÃ³nico no es vÃ¡lido."
             )
 
-        # Validar teléfono
+        # Validar telÃ©fono
         if not isinstance(telefono, str) or not telefono.isdigit() or len(telefono) != 10:
             raise ClienteInvalidoError(
-                "El teléfono debe tener exactamente 10 dígitos."
+                "El telÃ©fono debe tener exactamente 10 dÃ­gitos."
             )
 
         super().__init__(identificacion)
@@ -103,13 +124,13 @@ class Cliente(Entidad):
         return self.__telefono
 
     def mostrar_informacion(self):
-        """Muestra la información del cliente."""
+        """Muestra la informaciÃ³n del cliente."""
 
         print("\nDATOS DEL CLIENTE")
-        print(f"Identificación: {self.identificacion}")
+        print(f"IdentificaciÃ³n: {self.identificacion}")
         print(f"Nombre: {self.nombre}")
         print(f"Correo: {self.correo}")
-        print(f"Teléfono: {self.telefono}")
+        print(f"TelÃ©fono: {self.telefono}")
 
 
 
@@ -120,22 +141,22 @@ class GestorClientes:
         # Lista interna donde se almacenan los clientes
         self.__clientes = []
 
-    # Método para registrar un cliente
+    # MÃ©todo para registrar un cliente
     def registrar_cliente(self, cliente):
 
         if not isinstance(cliente, Cliente):
-            raise ClienteInvalidoError("El objeto ingresado no es un cliente válido.")
+            raise ClienteInvalidoError("El objeto ingresado no es un cliente vÃ¡lido.")
 
-        # Evitar clientes con identificación duplicada
+        # Evitar clientes con identificaciÃ³n duplicada
         for cliente_existente in self.__clientes:
             if cliente_existente.identificacion == cliente.identificacion:
-                raise ClienteInvalidoError("Ya existe un cliente con esa identificación.")
+                raise ClienteInvalidoError("Ya existe un cliente con esa identificaciÃ³n.")
 
         self.__clientes.append(cliente)
         logging.info("Cliente registrado correctamente.")
         print("Cliente registrado exitosamente.")
 
-    # Método para buscar un cliente por identificación
+    # MÃ©todo para buscar un cliente por identificaciÃ³n
     def buscar_cliente(self, identificacion):
 
         for cliente in self.__clientes:
@@ -144,19 +165,19 @@ class GestorClientes:
 
         return None
 
-    # Método para eliminar un cliente
+    # MÃ©todo para eliminar un cliente
     def eliminar_cliente(self, identificacion):
 
         cliente = self.buscar_cliente(identificacion)
 
         if cliente is None:
-            raise ClienteInvalidoError("No se encontró el cliente que desea eliminar.")
+            raise ClienteInvalidoError("No se encontrÃ³ el cliente que desea eliminar.")
 
         self.__clientes.remove(cliente)
         logging.info("Cliente eliminado correctamente.")
         print("Cliente eliminado exitosamente.")
 
-    # Método para mostrar todos los clientes
+    # MÃ©todo para mostrar todos los clientes
     def listar_clientes(self):
 
         if not self.__clientes:
@@ -180,10 +201,10 @@ class Servicio(ABC):
                 "El nombre del servicio es obligatorio."
             )
 
-        # Validar la descripción
+        # Validar la descripciÃ³n
         if not isinstance(descripcion, str) or not descripcion.strip():
             raise ServicioInvalidoError(
-                "La descripción del servicio es obligatoria."
+                "La descripciÃ³n del servicio es obligatoria."
             )
 
         self._nombre = nombre.strip()
@@ -194,17 +215,17 @@ class Servicio(ABC):
     def nombre(self):
         return self._nombre
 
-    # Propiedad para consultar la descripción
+    # Propiedad para consultar la descripciÃ³n
     @property
     def descripcion(self):
         return self._descripcion
 
-    # Método abstracto para calcular el costo
+    # MÃ©todo abstracto para calcular el costo
     @abstractmethod
     def calcular_costo(self, duracion, impuestos=0, descuento=0):
         pass
 
-    # Método abstracto para mostrar la información
+    # MÃ©todo abstracto para mostrar la informaciÃ³n
     @abstractmethod
     def mostrar_descripcion(self):
         pass
@@ -218,7 +239,7 @@ class ReservaEspacio(Servicio):
         # Validar la tarifa por hora
         if not isinstance(tarifa_por_hora, (int, float)) or tarifa_por_hora <= 0:
             raise ServicioInvalidoError(
-                "La tarifa por hora debe ser un número mayor que cero."
+                "La tarifa por hora debe ser un nÃºmero mayor que cero."
             )
 
         super().__init__(nombre, descripcion)
@@ -226,32 +247,59 @@ class ReservaEspacio(Servicio):
         self._tarifa_por_hora = tarifa_por_hora
 
     # Calcular el costo de la reserva
+
+    # Calcular el costo de la reserva
     def calcular_costo(self, duracion, impuestos=0, descuento=0):
 
-        if not isinstance(duracion, (int, float)) or duracion <= 0:
+        # Validar la duraciÃ³n
+        if (not isinstance(duracion, (int, float))
+                or isinstance(duracion, bool) or duracion <= 0):
             raise ServicioInvalidoError(
-                "La duración debe ser mayor que cero."
+                "La duraciÃ³n debe ser un nÃºmero mayor que cero."
             )
 
-        if impuestos < 0 or descuento < 0:
+        # Validar que impuestos y descuentos sean numÃ©ricos
+        if (not isinstance(impuestos, (int, float))
+                or isinstance(impuestos, bool)):
             raise ServicioInvalidoError(
-                "Los impuestos y descuentos no pueden ser negativos."
+                "Los impuestos deben ser un valor numÃ©rico."
             )
 
+        if (not isinstance(descuento, (int, float))
+                or isinstance(descuento, bool)):
+            raise ServicioInvalidoError(
+                "El descuento debe ser un valor numÃ©rico."
+            )
+
+        # Validar porcentajes
+        if impuestos < 0:
+            raise ServicioInvalidoError(
+                "Los impuestos no pueden ser negativos."
+            )
+
+        if descuento < 0 or descuento > 100:
+            raise ServicioInvalidoError(
+                "El descuento debe estar entre 0 y 100."
+            )
+
+        # Calcular el costo total
         subtotal = self._tarifa_por_hora * duracion
-        total = subtotal + (subtotal * impuestos / 100)
-        total -= subtotal * descuento / 100
+        valor_impuestos = subtotal * impuestos / 100
+        valor_descuento = subtotal * descuento / 100
+
+        total = subtotal + valor_impuestos - valor_descuento
 
         return total
 
-    # Mostrar la descripción del servicio
+
+    # Mostrar la descripciÃ³n del servicio
     def mostrar_descripcion(self):
 
         print("\nSERVICIO DE RESERVA DE ESPACIO")
         print(f"Nombre: {self.nombre}")
-        print(f"Descripción: {self.descripcion}")
+        print(f"DescripciÃ³n: {self.descripcion}")
         print(f"Tarifa por hora: ${self._tarifa_por_hora:,.0f}")
-        
+
 # Clase AlquilerEquipo: hereda de Servicio
 class AlquilerEquipo(Servicio):
 
@@ -268,35 +316,62 @@ class AlquilerEquipo(Servicio):
         self._tarifa_por_dia = tarifa_por_dia
 
     # Calcular el costo del alquiler
+
+    # Calcular el costo del alquiler
     def calcular_costo(self, duracion, impuestos=0, descuento=0):
 
-        if not isinstance(duracion, (int, float)) or duracion <= 0:
+        # Validar la duraciÃ³n
+        if (not isinstance(duracion, (int, float))
+                or isinstance(duracion, bool) or duracion <= 0):
             raise ServicioInvalidoError(
-                "La duración debe ser mayor que cero."
+                "La duraciÃ³n debe ser un nÃºmero mayor que cero."
             )
 
-        if impuestos < 0 or descuento < 0:
+        # Validar que impuestos y descuentos sean numÃ©ricos
+        if (not isinstance(impuestos, (int, float))
+                or isinstance(impuestos, bool)):
             raise ServicioInvalidoError(
-                "Los impuestos y descuentos no pueden ser negativos."
+                "Los impuestos deben ser un valor numÃ©rico."
             )
 
+        if (not isinstance(descuento, (int, float))
+                or isinstance(descuento, bool)):
+            raise ServicioInvalidoError(
+                "El descuento debe ser un valor numÃ©rico."
+            )
+
+        # Validar porcentajes
+        if impuestos < 0:
+            raise ServicioInvalidoError(
+                "Los impuestos no pueden ser negativos."
+            )
+
+        if descuento < 0 or descuento > 100:
+            raise ServicioInvalidoError(
+                "El descuento debe estar entre 0 y 100."
+            )
+
+        # Calcular el costo total
         subtotal = self._tarifa_por_dia * duracion
-        total = subtotal + (subtotal * impuestos / 100)
-        total -= subtotal * descuento / 100
+        valor_impuestos = subtotal * impuestos / 100
+        valor_descuento = subtotal * descuento / 100
+
+        total = subtotal + valor_impuestos - valor_descuento
 
         return total
 
-    # Mostrar la descripción del servicio
+
+    # Mostrar la descripciÃ³n del servicio
     def mostrar_descripcion(self):
 
         print("\nSERVICIO DE ALQUILER DE EQUIPOS")
         print(f"Nombre: {self.nombre}")
-        print(f"Descripción: {self.descripcion}")
-        print(f"Tarifa por día: ${self._tarifa_por_dia:,.0f}")
+        print(f"DescripciÃ³n: {self.descripcion}")
+        print(f"Tarifa por dÃ­a: ${self._tarifa_por_dia:,.0f}")
 
 
 
-# Clase que representa los servicios de consultoría especializada
+# Clase que representa los servicios de consultorÃ­a especializada
 class ConsultoriaEspecializada(Servicio):
 
     def __init__(self, nombre, descripcion, tarifa_por_hora):
@@ -304,32 +379,59 @@ class ConsultoriaEspecializada(Servicio):
 
         if not isinstance(tarifa_por_hora, (int, float)) or tarifa_por_hora <= 0:
             raise ServicioInvalidoError(
-                "La tarifa por hora debe ser un número positivo."
+                "La tarifa por hora debe ser un nÃºmero positivo."
             )
 
         self._tarifa_por_hora = tarifa_por_hora
 
+
     def calcular_costo(self, duracion, impuestos=0, descuento=0):
-        if not isinstance(duracion, (int, float)) or duracion <= 0:
+
+        # Validar la duraciÃ³n
+        if (not isinstance(duracion, (int, float))
+                or isinstance(duracion, bool) or duracion <= 0):
             raise ServicioInvalidoError(
-                "La duración de la consultoría debe ser positiva."
+                "La duraciÃ³n de la consultorÃ­a debe ser un nÃºmero positivo."
             )
 
-        if impuestos < 0 or descuento < 0:
+        # Validar que impuestos y descuentos sean numÃ©ricos
+        if (not isinstance(impuestos, (int, float))
+                or isinstance(impuestos, bool)):
             raise ServicioInvalidoError(
-                "Los impuestos y descuentos no pueden ser negativos."
+                "Los impuestos deben ser un valor numÃ©rico."
             )
 
+        if (not isinstance(descuento, (int, float))
+                or isinstance(descuento, bool)):
+            raise ServicioInvalidoError(
+                "El descuento debe ser un valor numÃ©rico."
+            )
+
+        # Validar porcentajes
+        if impuestos < 0:
+            raise ServicioInvalidoError(
+                "Los impuestos no pueden ser negativos."
+            )
+
+        if descuento < 0 or descuento > 100:
+            raise ServicioInvalidoError(
+                "El descuento debe estar entre 0 y 100."
+            )
+
+        # Calcular el costo total
         subtotal = self._tarifa_por_hora * duracion
-        total = subtotal + (subtotal * impuestos / 100)
-        total -= subtotal * descuento / 100
+        valor_impuestos = subtotal * impuestos / 100
+        valor_descuento = subtotal * descuento / 100
+
+        total = subtotal + valor_impuestos - valor_descuento
 
         return total
 
+
     def mostrar_descripcion(self):
-        print("\nSERVICIO DE CONSULTORÍA ESPECIALIZADA")
+        print("\nSERVICIO DE CONSULTORÃA ESPECIALIZADA")
         print(f"Nombre: {self.nombre}")
-        print(f"Descripción: {self.descripcion}")
+        print(f"DescripciÃ³n: {self.descripcion}")
         print(f"Tarifa por hora: ${self._tarifa_por_hora:,.0f}")
 
 
@@ -341,16 +443,16 @@ class Reserva:
     def __init__(self, id_reserva, cliente, servicio, duracion):
 
         if not isinstance(id_reserva, str) or not id_reserva.strip():
-            raise ReservaInvalidaError("El código de la reserva es obligatorio.")
+            raise ReservaInvalidaError("El cÃ³digo de la reserva es obligatorio.")
 
         if not isinstance(cliente, Cliente):
-            raise ReservaInvalidaError("Debe seleccionar un cliente válido.")
+            raise ReservaInvalidaError("Debe seleccionar un cliente vÃ¡lido.")
 
         if not isinstance(servicio, Servicio):
-            raise ReservaInvalidaError("Debe seleccionar un servicio válido.")
+            raise ReservaInvalidaError("Debe seleccionar un servicio vÃ¡lido.")
 
         if not isinstance(duracion, (int, float)) or isinstance(duracion, bool) or duracion <= 0:
-            raise ReservaInvalidaError("La duración debe ser positiva.")
+            raise ReservaInvalidaError("La duraciÃ³n debe ser positiva.")
 
         self.__id_reserva = id_reserva.strip()
         self.__cliente = cliente
@@ -374,11 +476,11 @@ class Reserva:
         return self.__costo_total
 
     def mostrar_informacion(self):
-        print("\nINFORMACIÓN DE LA RESERVA")
-        print(f"Código: {self.__id_reserva}")
+        print("\nINFORMACIÃ“N DE LA RESERVA")
+        print(f"CÃ³digo: {self.__id_reserva}")
         print(f"Cliente: {self.__cliente.nombre}")
         print(f"Servicio: {self.__servicio.nombre}")
-        print(f"Duración: {self.__duracion}")
+        print(f"DuraciÃ³n: {self.__duracion}")
         print(f"Costo total: ${self.__costo_total:,.0f}")
         print(f"Estado: {self.__estado}")
 
@@ -433,18 +535,18 @@ class GestorReservas:
     def registrar_reserva(self, reserva):
 
         if not isinstance(reserva, Reserva):
-            raise ReservaInvalidaError("Debe ingresar una reserva válida.")
+            raise ReservaInvalidaError("Debe ingresar una reserva vÃ¡lida.")
 
         for existente in self.__reservas:
             if existente.id_reserva == reserva.id_reserva:
-                raise ReservaInvalidaError("El código de reserva ya existe.")
+                raise ReservaInvalidaError("El cÃ³digo de reserva ya existe.")
 
         self.__reservas.append(reserva)
 
         logging.info("Reserva %s agregada al gestor.", reserva.id_reserva)
         print(f"Reserva {reserva.id_reserva} registrada en el sistema.")
 
-    # Buscar una reserva por su código
+    # Buscar una reserva por su cÃ³digo
     def buscar_reserva(self, id_reserva):
 
         for reserva in self.__reservas:
@@ -471,7 +573,7 @@ class GestorReservas:
         reserva = self.buscar_reserva(id_reserva)
 
         if reserva is None:
-            raise ReservaInvalidaError("No se encontró la reserva.")
+            raise ReservaInvalidaError("No se encontrÃ³ la reserva.")
 
         reserva.confirmar_reserva()
 
@@ -481,7 +583,7 @@ class GestorReservas:
         reserva = self.buscar_reserva(id_reserva)
 
         if reserva is None:
-            raise ReservaInvalidaError("No se encontró la reserva.")
+            raise ReservaInvalidaError("No se encontrÃ³ la reserva.")
 
         reserva.cancelar_reserva()
 
@@ -491,23 +593,65 @@ class GestorReservas:
         reserva = self.buscar_reserva(id_reserva)
 
         if reserva is None:
-            raise ReservaInvalidaError("No se encontró la reserva.")
+            raise ReservaInvalidaError("No se encontrÃ³ la reserva.")
 
         reserva.procesar_reserva()
 
 
 
+def demostrar_manejo_excepciones():
+    """Demuestra try/except, try/except/else/finally y encadenamiento."""
+
+    print("\nPRUEBAS DE MANEJO DE EXCEPCIONES")
+
+    # Ejemplo de try/except/else/finally con una conversiÃ³n correcta.
+    try:
+        duracion = convertir_duracion("2")
+    except DuracionInvalidaError as error:
+        logging.exception("Error al convertir la duraciÃ³n.")
+        print(f"Error controlado: {error}")
+    else:
+        print(f"DuraciÃ³n convertida correctamente: {duracion}")
+        logging.info("ConversiÃ³n de duraciÃ³n realizada correctamente.")
+    finally:
+        print("FinalizÃ³ la prueba de conversiÃ³n.")
+        logging.info("FinalizÃ³ la prueba try/except/else/finally.")
+
+    # Ejemplo de encadenamiento de excepciones.
+    try:
+        convertir_duracion("tres horas")
+    except DuracionInvalidaError as error:
+        logging.exception("Se produjo un error de duraciÃ³n.")
+        print(f"Error controlado: {error}")
+        if error.__cause__ is not None:
+            print(
+                "Causa original del error: "
+                f"{type(error.__cause__).__name__}"
+            )
+
+    # Ejemplo de try/except/finally ante datos de cliente invÃ¡lidos.
+    try:
+        Cliente("", " ", "correo-invalido", "123")
+    except ClienteInvalidoError as error:
+        logging.exception("Se capturÃ³ un error de validaciÃ³n de cliente.")
+        print(f"ValidaciÃ³n controlada: {error}")
+    finally:
+        logging.info("FinalizÃ³ la prueba de validaciÃ³n del cliente.")
+
+
 def main():
     print("=" * 50)
-    print("SISTEMA DE GESTIÓN - SOFTWARE FJ")
+    print("SISTEMA DE GESTIÃ“N - SOFTWARE FJ")
     print("=" * 50)
 
-    logging.info("El programa inició correctamente.")
+    logging.info("El programa iniciÃ³ correctamente.")
+
+    demostrar_manejo_excepciones()
 
     # Crear un cliente de prueba
     cliente_prueba = Cliente(
         "1108456723",
-        "Carlos Ramírez",
+        "Carlos RamÃ­rez",
         "carlos@gmail.com",
         "3104567890"
     )
@@ -541,6 +685,13 @@ def main():
 
     costo = servicio_prueba.calcular_costo(2)
     print(f"Costo de la reserva: ${costo:,.0f}")
+    costo_con_descuento = servicio_prueba.calcular_costo(
+        2, impuestos=19, descuento=10
+    )
+    print(
+        f"Costo con impuestos y descuento: "
+        f"${costo_con_descuento:,.0f}"
+    )
 
     # Crear un servicio de alquiler de equipos
     equipo_prueba = AlquilerEquipo(
@@ -553,18 +704,32 @@ def main():
 
     costo_equipo = equipo_prueba.calcular_costo(3)
     print(f"Costo del alquiler: ${costo_equipo:,.0f}")
+    costo_equipo_descuento = equipo_prueba.calcular_costo(
+        3, impuestos=19, descuento=10
+    )
+    print(
+        f"Costo del alquiler con impuestos y descuento: "
+        f"${costo_equipo_descuento:,.0f}"
+    )
 
-    # Crear un servicio de consultoría especializada
+    # Crear un servicio de consultorÃ­a especializada
     consultoria_prueba = ConsultoriaEspecializada(
-        "Asesoría administrativa",
-        "Consultoría para empresas y organizaciones",
+        "AsesorÃ­a administrativa",
+        "ConsultorÃ­a para empresas y organizaciones",
         60000
     )
 
     consultoria_prueba.mostrar_descripcion()
 
     costo_consultoria = consultoria_prueba.calcular_costo(2)
-    print(f"Costo de la consultoría: ${costo_consultoria:,.0f}")
+    print(f"Costo de la consultorÃ­a: ${costo_consultoria:,.0f}")
+    costo_consultoria_descuento = consultoria_prueba.calcular_costo(
+        2, impuestos=19, descuento=10
+    )
+    print(
+        f"Costo de la consultorÃ­a con impuestos y descuento: "
+        f"${costo_consultoria_descuento:,.0f}"
+    )
 
     # Crear el administrador de reservas
     gestor_reservas = GestorReservas()
@@ -601,7 +766,7 @@ def main():
     gestor_reservas.registrar_reserva(segunda_reserva)
     gestor_reservas.cancelar_reserva("RES002")
 
-    # Buscar una reserva por su código
+    # Buscar una reserva por su cÃ³digo
     reserva_encontrada = gestor_reservas.buscar_reserva("RES001")
 
     if reserva_encontrada:
@@ -611,7 +776,38 @@ def main():
     # Mostrar el listado final de reservas
     gestor_reservas.listar_reservas()
 
-    logging.info("El programa finalizó correctamente.")
+
+    # Prueba de creaciÃ³n incorrecta de un servicio
+    try:
+        ReservaEspacio(
+            "Sala invÃ¡lida",
+            "Prueba de tarifa incorrecta",
+            0
+        )
+    except ServicioInvalidoError as error:
+        logging.exception("Prueba de servicio invÃ¡lido.")
+        print(f"Servicio invÃ¡lido controlado: {error}")
+
+    # Prueba de creaciÃ³n incorrecta de una reserva
+    try:
+        Reserva(
+            "RES003",
+            cliente_prueba,
+            servicio_prueba,
+            0
+        )
+    except ReservaInvalidaError as error:
+        logging.exception("Prueba de reserva invÃ¡lida.")
+        print(f"Reserva invÃ¡lida controlada: {error}")
+
+    # Prueba de operaciÃ³n no permitida
+    try:
+        gestor_reservas.procesar_reserva("RES002")
+    except ReservaInvalidaError as error:
+        logging.exception("Prueba de operaciÃ³n no permitida.")
+        print(f"OperaciÃ³n no permitida controlada: {error}")
+
+    logging.info("El programa finalizÃ³ correctamente.")
 
 
 if __name__ == "__main__":
